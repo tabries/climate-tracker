@@ -1,0 +1,6 @@
+Create a document listing the commits to be done for the frontend and backend projects of the Climate & Impact Global Tracker project; for every technology and step I should be able to see the changes to learn how it was done; for example, for redis, only add the package when adding the code for redis, not before.
+From now on, for every document that you generate, add it to docs/ with a prefix depending on the subject, for example: 0.0_[title].md
+I want to add agents and skills for copilot, what skills do you think would be useful for this project? give me suggestions and commands to install them.
+
+Design Smart
+Leyes heurísticas, 10 principios de usabilidad y accesibilidad web de jakob nielsen
