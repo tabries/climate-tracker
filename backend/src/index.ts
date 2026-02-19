@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import weatherRoutes from './routes/weatherRoutes'
+import geocodeRoutes from './routes/geocodeRoutes'
 
 dotenv.config()
 
@@ -16,10 +18,12 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// API router placeholder — routes will be added in Stage 1
+// Routes
 app.get('/api', (_req, res) => {
   res.json({ message: 'Climate Tracker API', version: '0.1.0' })
 })
+app.use('/api/weather', weatherRoutes)
+app.use('/api/geocode', geocodeRoutes)
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`)
