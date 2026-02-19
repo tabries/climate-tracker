@@ -6,15 +6,15 @@ export interface GeocodeResult {
   full_name: string
 }
 
-/** Raw shape from Mapbox Geocoding API */
-export interface MapboxGeocodeFeature {
+/** Raw shape from MapTiler Geocoding API (compatible with Mapbox format) */
+export interface GeocodeResponse {
+  features: GeocodeFeature[]
+}
+
+export interface GeocodeFeature {
   id: string
   place_name: string
   center: [number, number] // [lon, lat]
   text: string
   context?: { id: string; text: string }[]
-}
-
-export interface MapboxGeocodeResponse {
-  features: MapboxGeocodeFeature[]
 }

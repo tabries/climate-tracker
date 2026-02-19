@@ -1,17 +1,17 @@
 import axios from 'axios'
-import type { GeocodeResult, MapboxGeocodeResponse } from '../types/geocode'
+import type { GeocodeResult, GeocodeResponse } from '../types/geocode'
 
-const MAPBOX_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places'
+const MAPTILER_BASE = 'https://api.maptiler.com/geocoding/v1'
 
 export async function geocode(query: string): Promise<GeocodeResult[]> {
-  const token = process.env.MAPBOX_ACCESS_TOKEN
-  if (!token) throw new Error('MAPBOX_ACCESS_TOKEN is not set')
+  const apiKey = process.env.MAPTILER_API_KEY
+  if (!apiKey) throw new Error('MAPTILER_API_KEY is not set')
 
-  const url = `${MAPBOX_BASE}/${encodeURIComponent(query)}.json`
+  const url = `${MAPTILER_BASE}/${encodeURIComponent(query)}.json`
 
-  const res = await axios.get<MapboxGeocodeResponse>(url, {
+  const res = await axios.get<GeocodeResponse>(url, {
     params: {
-      access_token: token,
+      key: apiKey,
       limit: 5,
       types: 'place,district,region,country',
     },
