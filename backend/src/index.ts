@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { connectRedis } from './config/redis'
 import weatherRoutes from './routes/weatherRoutes'
 import geocodeRoutes from './routes/geocodeRoutes'
 
@@ -28,5 +29,7 @@ app.use('/api/geocode', geocodeRoutes)
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 })
+
+connectRedis()
 
 export default app
