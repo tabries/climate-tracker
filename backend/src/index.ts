@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { connectRedis } from './config/redis'
+import { errorHandler } from './middleware/error'
+import { logger } from './utils/logger'
 import weatherRoutes from './routes/weatherRoutes'
 import geocodeRoutes from './routes/geocodeRoutes'
 
@@ -26,8 +28,11 @@ app.get('/api', (_req, res) => {
 app.use('/api/weather', weatherRoutes)
 app.use('/api/geocode', geocodeRoutes)
 
+// Global error handler — must be last
+app.use(errorHandler)
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
+  logger.info(`🚀 Server running on http://localhost:${PORT}`)
 })
 
 connectRedis()
