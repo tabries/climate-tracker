@@ -36,12 +36,16 @@ export function MapContainer() {
     )
 
     // Click on map → update selected location
+    // Normalize lng to [-180, 180] to handle world-wrap panning
     map.on('click', (e) => {
       const { lng, lat } = e.lngLat
+      const normalizedLng = ((((lng + 180) % 360) + 360) % 360) - 180
+      const roundedLat = Math.round(lat * 1e5) / 1e5
+      const roundedLon = Math.round(normalizedLng * 1e5) / 1e5
       setSelectedLocation({
-        lat: Math.round(lat * 1e5) / 1e5,
-        lon: Math.round(lng * 1e5) / 1e5,
-        name: `${lat.toFixed(2)}, ${lng.toFixed(2)}`,
+        lat: roundedLat,
+        lon: roundedLon,
+        name: `${roundedLat.toFixed(2)}, ${roundedLon.toFixed(2)}`,
       })
     })
 
