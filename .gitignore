@@ -44,3 +44,4 @@ coverage/
 *.env.docker
 # Local documentation (not tracked)
 docs/
+.agents/
