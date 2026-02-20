@@ -1,30 +1,32 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@import "tailwindcss";
+
+/* ── Custom theme tokens ─────────────────────────────────────────────────── */
+@theme {
+  --color-surface: #0f1117;
+  --color-surface-alt: #1a1d2e;
+  --color-surface-hover: #252940;
+  --color-border: #2d3148;
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-accent: #38bdf8;
+  --color-accent-hover: #7dd3fc;
+  --color-danger: #f87171;
+  --color-success: #4ade80;
+  --font-sans: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-body {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #0f1117;
-  color: #e2e8f0;
-  min-height: 100vh;
-}
+/* ── Base resets ──────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    color-scheme: dark;
+    @apply antialiased;
+  }
 
-.app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  gap: 1rem;
-}
+  body {
+    @apply bg-surface text-text-primary font-sans min-h-screen;
+  }
 
-h1 {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-p {
-  color: #94a3b8;
+  #root {
+    @apply min-h-screen;
+  }
 }

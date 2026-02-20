@@ -1,8 +1,8 @@
 function App() {
   return (
-    <div className="app">
-      <h1>🌍 Climate &amp; Impact Global Tracker</h1>
-      <p>Stage 0 — Project running successfully.</p>
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <h1 className="text-3xl font-bold">🌍 Climate &amp; Impact Global Tracker</h1>
+      <p className="text-text-secondary">Stage 2 — Tailwind CSS active.</p>
     </div>
   )
 }
