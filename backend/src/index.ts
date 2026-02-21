@@ -6,6 +6,8 @@ import { errorHandler } from './middleware/error'
 import { logger } from './utils/logger'
 import weatherRoutes from './routes/weatherRoutes'
 import geocodeRoutes from './routes/geocodeRoutes'
+import airQualityRoutes from './routes/airQualityRoutes'
+import tileRoutes from './routes/tileRoutes'
 
 dotenv.config()
 
@@ -27,6 +29,8 @@ app.get('/api', (_req, res) => {
 })
 app.use('/api/weather', weatherRoutes)
 app.use('/api/geocode', geocodeRoutes)
+app.use('/api/air-quality', airQualityRoutes)
+app.use('/api/tiles', tileRoutes)
 
 // Global error handler — must be last
 app.use(errorHandler)
