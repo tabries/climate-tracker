@@ -1,8 +1,10 @@
 import { useWeatherStore } from '@/store/weatherStore'
+import type { AirQualityData } from '@/store/weatherStore'
 
-/** Displays current weather and 5-day forecast for the selected location. */
+/** Displays current weather, AQI, and 5-day forecast for the selected location. */
 export function DataPanel() {
   const weather = useWeatherStore((s) => s.weather)
+  const airQuality = useWeatherStore((s) => s.airQuality)
   const loading = useWeatherStore((s) => s.loading)
   const error = useWeatherStore((s) => s.error)
   const selectedLocation = useWeatherStore((s) => s.selectedLocation)
@@ -67,6 +69,9 @@ export function DataPanel() {
         </div>
       </div>
 
+      {/* ── Air Quality ──────────────────────────────────────────────── */}
+      {airQuality && <AqiSection data={airQuality} />}
+
       {/* ── 5-day forecast ────────────────────────────────────────────── */}
       <div>
         <h3 className="text-sm font-semibold text-text-secondary mb-2 uppercase tracking-wide">
@@ -98,6 +103,34 @@ export function DataPanel() {
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
+
+const AQI_COLORS = ['#4ade80', '#facc15', '#fb923c', '#f87171', '#a855f7']
+
+function AqiSection({ data }: { data: AirQualityData }) {
+  const color = AQI_COLORS[data.aqi - 1] ?? '#94a3b8'
+
+  return (
+    <div className="rounded-lg bg-surface-alt border border-border p-4">
+      <div className="flex items-center gap-3 mb-3">
+        <div
+          className="px-3 py-1 rounded-full text-sm font-bold"
+          style={{ backgroundColor: color + '22', color }}
+        >
+          AQI {data.aqi}
+        </div>
+        <span className="text-sm text-text-secondary">{data.label}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <Stat label="PM2.5" value={`${data.components.pm2_5.toFixed(1)} µg/m³`} />
+        <Stat label="PM10" value={`${data.components.pm10.toFixed(1)} µg/m³`} />
+        <Stat label="O₃" value={`${data.components.o3.toFixed(1)} µg/m³`} />
+        <Stat label="NO₂" value={`${data.components.no2.toFixed(1)} µg/m³`} />
+        <Stat label="SO₂" value={`${data.components.so2.toFixed(1)} µg/m³`} />
+        <Stat label="CO" value={`${data.components.co.toFixed(1)} µg/m³`} />
+      </div>
+    </div>
+  )
+}
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (

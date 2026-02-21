@@ -37,9 +37,25 @@ export interface WeatherData {
   forecast: ForecastDay[]
 }
 
+export interface AirQualityData {
+  aqi: number
+  label: string
+  components: {
+    co: number
+    no: number
+    no2: number
+    o3: number
+    so2: number
+    pm2_5: number
+    pm10: number
+    nh3: number
+  }
+}
+
 interface WeatherState {
   selectedLocation: SelectedLocation | null
   weather: WeatherData | null
+  airQuality: AirQualityData | null
   loading: boolean
   error: string | null
 
@@ -52,28 +68,45 @@ interface WeatherState {
 export const useWeatherStore = create<WeatherState>((set) => ({
   selectedLocation: null,
   weather: null,
+  airQuality: null,
   loading: false,
   error: null,
 
   setSelectedLocation: async (loc) => {
-    set({ selectedLocation: loc, loading: true, error: null })
+    set({ selectedLocation: loc, loading: true, error: null, airQuality: null })
 
-    try {
-      const res = await fetch(`/api/weather/${loc.lat}/${loc.lon}`)
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.message ?? `Weather API error (${res.status})`)
-      }
-      const data: WeatherData = await res.json()
-      set({ weather: data, loading: false })
-    } catch (err) {
+    // Fetch weather + AQI concurrently; weather is critical, AQI is best-effort
+    const [weatherResult, aqiResult] = await Promise.allSettled([
+      fetch(`/api/weather/${loc.lat}/${loc.lon}`).then(async (res) => {
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(body.message ?? `Weather API error (${res.status})`)
+        }
+        return res.json() as Promise<WeatherData>
+      }),
+      fetch(`/api/air-quality/${loc.lat}/${loc.lon}`).then(async (res) => {
+        if (!res.ok) throw new Error('AQI unavailable')
+        return res.json() as Promise<AirQualityData>
+      }),
+    ])
+
+    if (weatherResult.status === 'fulfilled') {
+      set({ weather: weatherResult.value, loading: false })
+    } else {
       set({
-        error: err instanceof Error ? err.message : 'Unknown error',
+        error:
+          weatherResult.reason instanceof Error
+            ? weatherResult.reason.message
+            : 'Unknown error',
         loading: false,
       })
+    }
+
+    if (aqiResult.status === 'fulfilled') {
+      set({ airQuality: aqiResult.value })
     }
   },
 
   clearSelection: () =>
-    set({ selectedLocation: null, weather: null, error: null }),
+    set({ selectedLocation: null, weather: null, airQuality: null, error: null }),
 }))

@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useWeatherStore } from '@/store/weatherStore'
+import { useWeatherLayers } from '@/components/Map/hooks/useWeatherLayers'
 
 const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_API_KEY ?? ''
 
@@ -13,6 +14,7 @@ export function MapContainer() {
   const mapRef = useRef<maplibregl.Map | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const markerRef = useRef<maplibregl.Marker | null>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   const selectedLocation = useWeatherStore((s) => s.selectedLocation)
   const setSelectedLocation = useWeatherStore((s) => s.setSelectedLocation)
@@ -34,6 +36,8 @@ export function MapContainer() {
       new maplibregl.AttributionControl({ compact: true }),
       'bottom-right',
     )
+
+    map.on('load', () => setMapLoaded(true))
 
     // Click on map → update selected location
     // Normalize lng to [-180, 180] to handle world-wrap panning
@@ -57,6 +61,9 @@ export function MapContainer() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // ── Sync weather tile layers with store ──────────────────────────────
+  useWeatherLayers(mapLoaded ? mapRef.current : null)
 
   // ── Fly to selected location and place marker ───────────────────────────
   useEffect(() => {

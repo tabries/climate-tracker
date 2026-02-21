@@ -45,3 +45,5 @@ coverage/
 # Local documentation (not tracked)
 docs/
 .agents/
+.playwright-mcp/
+skills-lock.json

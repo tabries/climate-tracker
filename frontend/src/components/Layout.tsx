@@ -1,6 +1,8 @@
 import { SearchBar } from '@/components/SearchBar'
 import { DataPanel } from '@/components/DataPanel'
 import { MapContainer } from '@/components/Map/MapContainer'
+import { LayerManager } from '@/components/Map/LayerManager'
+import { Legend } from '@/components/Map/Legend'
 
 /**
  * Main application layout: full-screen map with a sidebar for search + data.
@@ -27,6 +29,14 @@ export function Layout() {
       {/* ── Map ────────────────────────────────────────────────────────── */}
       <main className="flex-1 relative">
         <MapContainer />
+
+        {/* Map overlays */}
+        <div className="absolute top-4 left-4 z-10">
+          <LayerManager />
+        </div>
+        <div className="absolute bottom-6 left-4 z-10">
+          <Legend />
+        </div>
       </main>
     </div>
   )
