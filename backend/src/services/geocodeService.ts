@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { apiClient } from '../config/apiClient'
 import { logger } from '../utils/logger'
 import type { GeocodeResult, GeocodeResponse } from '../types/geocode'
 
@@ -13,7 +14,7 @@ export async function geocode(query: string): Promise<GeocodeResult[]> {
   logger.info(`[Geocode] URL: ${url}`)
 
   try {
-    const res = await axios.get<GeocodeResponse>(url, {
+    const res = await apiClient.get<GeocodeResponse>(url, {
       params: {
         key: apiKey,
       },

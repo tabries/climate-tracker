@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { apiClient } from '../config/apiClient'
 import type {
   WeatherResponse,
   OWMCurrentResponse,
@@ -41,8 +41,8 @@ export async function getWeather(lat: number, lon: number): Promise<WeatherRespo
   const params = { lat, lon, appid: apiKey, units: 'metric' }
 
   const [currentRes, forecastRes] = await Promise.all([
-    axios.get<OWMCurrentResponse>(`${BASE_URL}/weather`, { params }),
-    axios.get<OWMForecastResponse>(`${BASE_URL}/forecast`, { params }),
+    apiClient.get<OWMCurrentResponse>(`${BASE_URL}/weather`, { params }),
+    apiClient.get<OWMForecastResponse>(`${BASE_URL}/forecast`, { params }),
   ])
 
   const c = currentRes.data
