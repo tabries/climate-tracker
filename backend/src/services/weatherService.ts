@@ -46,7 +46,8 @@ export async function getWeather(lat: number, lon: number): Promise<WeatherRespo
   ])
 
   const c = currentRes.data
-  const location = `${c.name}, ${c.sys.country}`
+  const parts = [c.name, c.sys.country].filter(Boolean)
+  const location = parts.length > 0 ? parts.join(', ') : `${c.coord.lat.toFixed(2)}, ${c.coord.lon.toFixed(2)}`
 
   return {
     lat: c.coord.lat,

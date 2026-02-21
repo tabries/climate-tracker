@@ -48,7 +48,7 @@ export interface OWMForecastItem {
 
 export interface OWMCurrentResponse {
   name: string
-  sys: { country: string }
+  sys: { country?: string }
   coord: { lat: number; lon: number }
   main: {
     temp: number
