@@ -7,6 +7,7 @@ import { Legend } from '@/components/Map/Legend'
 import { GlobeLegend } from '@/components/Globe/GlobeLegend'
 import { RealtimeStatus } from '@/components/RealtimeStatus'
 import { AlertsBadge } from '@/components/AlertsBadge'
+import { AnalyticsPanel } from '@/components/Analytics/AnalyticsPanel'
 import { useSocket } from '@/hooks/useSocket'
 import { useViewStore, type ViewMode } from '@/store/viewStore'
 
@@ -125,6 +126,9 @@ export function Layout() {
             <GlobeLegend />
           </div>
         )}
+
+        {/* Analytics panel — slides up from bottom */}
+        <AnalyticsPanel />
       </main>
     </div>
   )

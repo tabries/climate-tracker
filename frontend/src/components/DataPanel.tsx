@@ -4,11 +4,13 @@ import { useRealtimeStore } from '@/store/realtimeStore'
 
 /** Displays current weather, AQI, and 5-day forecast for the selected location. */
 export function DataPanel() {
+  // All hooks must be at the top, unconditionally
   const weather = useWeatherStore((s) => s.weather)
   const airQuality = useWeatherStore((s) => s.airQuality)
   const loading = useWeatherStore((s) => s.loading)
   const error = useWeatherStore((s) => s.error)
   const selectedLocation = useWeatherStore((s) => s.selectedLocation)
+  const isLive = useRealtimeStore((s) => s.connectionStatus === 'connected')
 
   if (!selectedLocation) {
     return (
@@ -39,7 +41,6 @@ export function DataPanel() {
 
   const { current, forecast, location } = weather
   const iconUrl = `https://openweathermap.org/img/wn/${current.icon}@2x.png`
-  const isLive = useRealtimeStore((s) => s.connectionStatus === 'connected')
 
   return (
     <div className="flex flex-col gap-4 p-4 overflow-y-auto h-full">
