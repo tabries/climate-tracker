@@ -2,6 +2,7 @@ import { Server as SocketServer, Socket } from 'socket.io'
 import type { Server as HttpServer } from 'http'
 import { getWeather } from '../services/weatherService'
 import { getAirQuality } from '../services/airQualityService'
+import { writeWeatherPoint, writeAirQualityPoint } from '../services/influxService'
 import { logger } from '../utils/logger'
 
 /* ── Configuration ──────────────────────────────────────────────────────── */
@@ -77,6 +78,9 @@ async function fetchAndEmit(
         timestamp,
       }
       io.to(key).emit('weather:update', update)
+
+      // Persist to InfluxDB (fire-and-forget)
+      writeWeatherPoint(w)
     } else {
       logger.warn(`Socket broadcast: weather fetch failed for ${key}`, {
         error: weatherResult.reason?.message,
@@ -94,6 +98,9 @@ async function fetchAndEmit(
         timestamp,
       }
       io.to(key).emit('air-quality:update', update)
+
+      // Persist to InfluxDB (fire-and-forget)
+      writeAirQualityPoint(lat, lon, a)
     }
   } catch (err) {
     logger.error(`Socket broadcast error for ${key}`, {

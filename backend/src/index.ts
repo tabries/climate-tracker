@@ -3,6 +3,7 @@ import { createServer } from 'http'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { connectRedis } from './config/redis'
+import { connectInflux } from './config/influx'
 import { errorHandler } from './middleware/error'
 import { logger } from './utils/logger'
 import { setupSocketIO } from './socket/socketService'
@@ -10,6 +11,7 @@ import weatherRoutes from './routes/weatherRoutes'
 import geocodeRoutes from './routes/geocodeRoutes'
 import airQualityRoutes from './routes/airQualityRoutes'
 import tileRoutes from './routes/tileRoutes'
+import historyRoutes from './routes/historyRoutes'
 
 dotenv.config()
 
@@ -34,6 +36,7 @@ app.use('/api/weather', weatherRoutes)
 app.use('/api/geocode', geocodeRoutes)
 app.use('/api/air-quality', airQualityRoutes)
 app.use('/api/tiles', tileRoutes)
+app.use('/api/history', historyRoutes)
 
 // Global error handler — must be last
 app.use(errorHandler)
@@ -47,5 +50,6 @@ httpServer.listen(PORT, () => {
 })
 
 connectRedis()
+connectInflux()
 
 export default app
