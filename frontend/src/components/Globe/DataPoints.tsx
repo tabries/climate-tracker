@@ -1,5 +1,5 @@
 import { useRef, useMemo, useCallback } from 'react'
-import { useFrame, ThreeEvent } from '@react-three/fiber'
+import { useFrame, ThreeEvent, useThree } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { geoToVector3 } from '@/utils/geoToVector'
@@ -54,6 +54,8 @@ export function DataPoints() {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const [hovered, setHovered] = useState<CityDataPoint | null>(null)
   const [hoveredIdx, setHoveredIdx] = useState(-1)
+  
+  const { raycaster } = useThree()
 
   const setSelectedLocation = useWeatherStore((s) => s.setSelectedLocation)
   const setMode = useViewStore((s) => s.setMode)
@@ -148,15 +150,50 @@ export function DataPoints() {
 
   const handleClick = useCallback(
     (e: ThreeEvent<MouseEvent>) => {
+      if (!meshRef.current) return
       e.stopPropagation()
-      const idx = e.instanceId
-      if (idx === undefined || idx < 0) return
-      const city = WORLD_CITIES[idx]
-      // Navigate to 2D map with this location
-      setSelectedLocation({ lat: city.lat, lon: city.lon, name: city.name })
-      setMode('map')
+      
+      // Use raycarding to find which instance was clicked
+      // This is more reliable than relying on e.instanceId
+      const intersections = raycaster.intersectObject(meshRef.current)
+      
+      if (intersections.length === 0) return
+      
+      // Get the first intersection point
+      const intersection = intersections[0]
+      
+      // For InstancedMesh, we need to find which instance was closest
+      // by checking the intersection point against our instance positions
+      if (!intersection.instanceId && intersection.instanceId !== 0) {
+        // Fallback: estimate based on distance to the intersection point
+        let closestIdx = 0
+        let closestDist = Infinity
+        const intersectionPoint = intersection.point
+        
+        for (let i = 0; i < WORLD_CITIES.length; i++) {
+          const pos = geoToVector3(WORLD_CITIES[i].lat, WORLD_CITIES[i].lon, ELEVATION)
+          const dist = pos.distanceTo(intersectionPoint)
+          if (dist < closestDist) {
+            closestDist = dist
+            closestIdx = i
+          }
+        }
+        
+        if (closestDist > 0.1) return // too far, not a real click on a point
+        
+        const city = WORLD_CITIES[closestIdx]
+        setSelectedLocation({ lat: city.lat, lon: city.lon, name: city.name })
+        setMode('map')
+      } else {
+        // Use instanceId if available
+        const idx = intersection.instanceId
+        if (idx === undefined || idx < 0) return
+        const city = WORLD_CITIES[idx]
+        setSelectedLocation({ lat: city.lat, lon: city.lon, name: city.name })
+        setMode('map')
+      }
     },
-    [setSelectedLocation, setMode],
+    [raycaster, setSelectedLocation, setMode],
   )
 
   return (
