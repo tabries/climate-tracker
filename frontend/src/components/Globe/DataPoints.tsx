@@ -1,11 +1,9 @@
 import { useRef, useMemo, useCallback } from 'react'
-import { useFrame, ThreeEvent, useThree } from '@react-three/fiber'
+import { useFrame, ThreeEvent } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { geoToVector3 } from '@/utils/geoToVector'
 import { WORLD_CITIES, type CityDataPoint } from '@/data/worldCities'
-import { useWeatherStore } from '@/store/weatherStore'
-import { useViewStore } from '@/store/viewStore'
 import { useState } from 'react'
 
 /* ── Constants ────────────────────────────────────────────────────────── */
@@ -50,15 +48,15 @@ function tempToColor(temp: number): THREE.Color {
  * Each data point is color-coded by temperature.
  * Hovering shows a tooltip; clicking navigates to the 2D map.
  */
+/**
+ * Visual-only data points. Click interaction lives in EarthMesh
+ * (clicking the earth surface selects the nearest city).
+ * This component only handles hover tooltips and pulse animation.
+ */
 export function DataPoints() {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const [hovered, setHovered] = useState<CityDataPoint | null>(null)
   const [hoveredIdx, setHoveredIdx] = useState(-1)
-  
-  const { raycaster } = useThree()
-
-  const setSelectedLocation = useWeatherStore((s) => s.setSelectedLocation)
-  const setMode = useViewStore((s) => s.setMode)
 
   // Pre-compute matrices and colors once
   const { matrices, colors, tempGeom } = useMemo(() => {
@@ -148,53 +146,10 @@ export function DataPoints() {
     document.body.style.cursor = 'default'
   }, [hoveredIdx, resetHoveredScale])
 
-  const handleClick = useCallback(
-    (e: ThreeEvent<MouseEvent>) => {
-      if (!meshRef.current) return
-      e.stopPropagation()
-      
-      // Use raycarding to find which instance was clicked
-      // This is more reliable than relying on e.instanceId
-      const intersections = raycaster.intersectObject(meshRef.current)
-      
-      if (intersections.length === 0) return
-      
-      // Get the first intersection point
-      const intersection = intersections[0]
-      
-      // For InstancedMesh, we need to find which instance was closest
-      // by checking the intersection point against our instance positions
-      if (!intersection.instanceId && intersection.instanceId !== 0) {
-        // Fallback: estimate based on distance to the intersection point
-        let closestIdx = 0
-        let closestDist = Infinity
-        const intersectionPoint = intersection.point
-        
-        for (let i = 0; i < WORLD_CITIES.length; i++) {
-          const pos = geoToVector3(WORLD_CITIES[i].lat, WORLD_CITIES[i].lon, ELEVATION)
-          const dist = pos.distanceTo(intersectionPoint)
-          if (dist < closestDist) {
-            closestDist = dist
-            closestIdx = i
-          }
-        }
-        
-        if (closestDist > 0.1) return // too far, not a real click on a point
-        
-        const city = WORLD_CITIES[closestIdx]
-        setSelectedLocation({ lat: city.lat, lon: city.lon, name: city.name })
-        setMode('map')
-      } else {
-        // Use instanceId if available
-        const idx = intersection.instanceId
-        if (idx === undefined || idx < 0) return
-        const city = WORLD_CITIES[idx]
-        setSelectedLocation({ lat: city.lat, lon: city.lon, name: city.name })
-        setMode('map')
-      }
-    },
-    [raycaster, setSelectedLocation, setMode],
-  )
+  // Noop – click is handled by EarthMesh
+  const handleClick = useCallback((_e: ThreeEvent<MouseEvent>) => {
+    // intentionally empty; EarthMesh owns the click-to-city logic
+  }, [])
 
   return (
     <>
@@ -204,6 +159,7 @@ export function DataPoints() {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
         onClick={handleClick}
+        renderOrder={1}
       >
         <meshStandardMaterial
           vertexColors
