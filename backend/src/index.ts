@@ -1,7 +1,11 @@
+import dotenv from 'dotenv'
+
+// Load environment variables FIRST, before any other imports
+dotenv.config()
+
 import express from 'express'
 import { createServer } from 'http'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import { connectRedis } from './config/redis'
 import { connectInflux } from './config/influx'
 import { errorHandler } from './middleware/error'
@@ -12,8 +16,6 @@ import geocodeRoutes from './routes/geocodeRoutes'
 import airQualityRoutes from './routes/airQualityRoutes'
 import tileRoutes from './routes/tileRoutes'
 import historyRoutes from './routes/historyRoutes'
-
-dotenv.config()
 
 const app = express()
 const httpServer = createServer(app)
