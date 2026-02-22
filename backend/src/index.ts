@@ -1,9 +1,11 @@
 import express from 'express'
+import { createServer } from 'http'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { connectRedis } from './config/redis'
 import { errorHandler } from './middleware/error'
 import { logger } from './utils/logger'
+import { setupSocketIO } from './socket/socketService'
 import weatherRoutes from './routes/weatherRoutes'
 import geocodeRoutes from './routes/geocodeRoutes'
 import airQualityRoutes from './routes/airQualityRoutes'
@@ -12,6 +14,7 @@ import tileRoutes from './routes/tileRoutes'
 dotenv.config()
 
 const app = express()
+const httpServer = createServer(app)
 const PORT = process.env.PORT ?? 5000
 
 // Middleware
@@ -35,7 +38,11 @@ app.use('/api/tiles', tileRoutes)
 // Global error handler — must be last
 app.use(errorHandler)
 
-app.listen(PORT, () => {
+// Socket.IO — attach to the HTTP server
+const io = setupSocketIO(httpServer)
+export { io }
+
+httpServer.listen(PORT, () => {
   logger.info(`🚀 Server running on http://localhost:${PORT}`)
 })
 
