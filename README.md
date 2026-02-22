@@ -1,6 +1,6 @@
-# 🌍 Climate & Impact Global Tracker
+# Interactive Climate & Impact Global Tracker
 
-An interactive dashboard for visualizing global climate data in real time, combining 2D interactive maps with 3D Three.js visualization. Targeted at financial analysts to understand climate risks, environmental data, and their impact on parametric insurance.
+An interactive dashboard for visualizing global climate data in real time, combining 2D interactive maps with 3D Three.js visualization. Targeted at climate analysts to understand climate risks, environmental data, and their impact.
 
 ## Tech Stack
 

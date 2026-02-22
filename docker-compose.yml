@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Base infrastructure for local development.
 # Services for Stage 1+ (Redis, InfluxDB, Grafana) are defined but
 # commented out — they will be enabled as each stage is implemented.
