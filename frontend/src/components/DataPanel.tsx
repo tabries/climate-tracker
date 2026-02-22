@@ -1,5 +1,6 @@
 import { useWeatherStore } from '@/store/weatherStore'
 import type { AirQualityData } from '@/store/weatherStore'
+import { useRealtimeStore } from '@/store/realtimeStore'
 
 /** Displays current weather, AQI, and 5-day forecast for the selected location. */
 export function DataPanel() {
@@ -38,12 +39,24 @@ export function DataPanel() {
 
   const { current, forecast, location } = weather
   const iconUrl = `https://openweathermap.org/img/wn/${current.icon}@2x.png`
+  const isLive = useRealtimeStore((s) => s.connectionStatus === 'connected')
 
   return (
     <div className="flex flex-col gap-4 p-4 overflow-y-auto h-full">
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div>
-        <h2 className="text-lg font-semibold text-text-primary">{location}</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-text-primary">{location}</h2>
+          {isLive && (
+            <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
+              Live
+            </span>
+          )}
+        </div>
         <p className="text-xs text-text-secondary">
           {selectedLocation.lat.toFixed(4)}, {selectedLocation.lon.toFixed(4)}
         </p>

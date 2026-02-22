@@ -5,6 +5,9 @@ import { MapContainer } from '@/components/Map/MapContainer'
 import { LayerManager } from '@/components/Map/LayerManager'
 import { Legend } from '@/components/Map/Legend'
 import { GlobeLegend } from '@/components/Globe/GlobeLegend'
+import { RealtimeStatus } from '@/components/RealtimeStatus'
+import { AlertsBadge } from '@/components/AlertsBadge'
+import { useSocket } from '@/hooks/useSocket'
 import { useViewStore, type ViewMode } from '@/store/viewStore'
 
 // Lazy-load the Globe to avoid loading Three.js until the user requests it
@@ -52,16 +55,25 @@ function ViewToggle() {
 export function Layout() {
   const viewMode = useViewStore((s) => s.mode)
 
+  // Establish the Socket.IO connection and auto-subscribe to selected location
+  useSocket()
+
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       {/* ── Sidebar ────────────────────────────────────────────────────── */}
       <aside className="flex flex-col w-96 shrink-0 border-r border-border bg-surface">
         {/* Header */}
         <div className="p-4 border-b border-border">
-          <h1 className="text-base font-bold tracking-tight mb-3">
-            🌍 Climate Tracker
-          </h1>
-          <SearchBar />
+          <div className="flex items-center justify-between mb-1">
+            <h1 className="text-base font-bold tracking-tight">
+              🌍 Climate Tracker
+            </h1>
+            <AlertsBadge />
+          </div>
+          <RealtimeStatus />
+          <div className="mt-3">
+            <SearchBar />
+          </div>
         </div>
 
         {/* Data panel (scrollable) */}
