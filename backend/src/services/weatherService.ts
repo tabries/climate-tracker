@@ -1,4 +1,5 @@
 import { apiClient } from '../config/apiClient'
+import { trackOWMCall } from '../utils/usageTracker'
 import type {
   WeatherResponse,
   OWMCurrentResponse,
@@ -38,6 +39,9 @@ export async function getWeather(lat: number, lon: number): Promise<WeatherRespo
   const apiKey = process.env.OPENWEATHERMAP_API_KEY
   if (!apiKey) throw new Error('OPENWEATHERMAP_API_KEY is not set')
 
+  // Two OWM calls: current weather + 5-day forecast
+  await trackOWMCall(2)
+
   const params = { lat, lon, appid: apiKey, units: 'metric' }
 
   const [currentRes, forecastRes] = await Promise.all([
@@ -46,8 +50,7 @@ export async function getWeather(lat: number, lon: number): Promise<WeatherRespo
   ])
 
   const c = currentRes.data
-  const parts = [c.name, c.sys.country].filter(Boolean)
-  const location = parts.length > 0 ? parts.join(', ') : `${c.coord.lat.toFixed(2)}, ${c.coord.lon.toFixed(2)}`
+  const location = `${c.name}, ${c.sys.country}`
 
   return {
     lat: c.coord.lat,
