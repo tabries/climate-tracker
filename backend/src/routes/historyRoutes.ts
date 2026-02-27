@@ -5,8 +5,21 @@ import {
   type HistoryPoint,
   type AqiHistoryPoint,
 } from '../services/influxService'
+import { cache } from '../middleware/cache'
 
 const router = Router()
+
+/** TTL in seconds for each time range — shorter ranges refresh sooner */
+const HISTORY_TTL: Record<string, number> = {
+  '1h':  5 * 60,
+  '6h':  10 * 60,
+  '12h': 15 * 60,
+  '24h': 20 * 60,
+  '3d':  30 * 60,
+  '7d':  60 * 60,
+  '14d': 2 * 60 * 60,
+  '30d': 3 * 60 * 60,
+}
 
 /* ── Allowed range / window values (prevent Flux injection) ─────────────── */
 
@@ -34,6 +47,12 @@ function resolveWindow(range: string): string {
  */
 router.get(
   '/weather/:lat/:lon',
+  (req, res, next) => {
+    const range = ALLOWED_RANGES.has(req.query.range as string)
+      ? (req.query.range as string)
+      : '24h'
+    return cache(HISTORY_TTL[range] ?? 20 * 60)(req, res, next)
+  },
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const lat = parseFloat(String(req.params.lat))
@@ -66,6 +85,12 @@ router.get(
  */
 router.get(
   '/air-quality/:lat/:lon',
+  (req, res, next) => {
+    const range = ALLOWED_RANGES.has(req.query.range as string)
+      ? (req.query.range as string)
+      : '24h'
+    return cache(HISTORY_TTL[range] ?? 20 * 60)(req, res, next)
+  },
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const lat = parseFloat(String(req.params.lat))
