@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useWeatherStore } from '@/store/weatherStore'
+import { WORLD_CITIES } from '@/data/worldCities'
 
 interface Suggestion {
   lat: number
@@ -7,20 +8,39 @@ interface Suggestion {
   name: string
   country: string
   full_name: string
+  isCity?: boolean
 }
 
 /**
- * Debounced search bar that queries the geocode API and shows suggestions.
+ * Debounced search bar with world-cities quick-pick and geocode fallback.
  */
 export function SearchBar() {
   const [query, setQuery] = useState('')
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [geocodeSuggestions, setGeocodeSuggestions] = useState<Suggestion[]>([])
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const setSelectedLocation = useWeatherStore((s) => s.setSelectedLocation)
+
+  // Build client-side city matches instantly from worldCities list
+  const q = query.toLowerCase().trim()
+  const cityMatches: Suggestion[] = q
+    ? WORLD_CITIES.filter((c) => c.name.toLowerCase().includes(q))
+        .slice(0, 5)
+        .map((c) => ({ lat: c.lat, lon: c.lon, name: c.name, country: '', full_name: c.name, isCity: true }))
+    : WORLD_CITIES.slice(0, 6).map((c) => ({
+        lat: c.lat, lon: c.lon, name: c.name, country: '', full_name: c.name, isCity: true,
+      }))
+
+  // Merge: known cities first, then geocode results (no duplicates)
+  const suggestions: Suggestion[] = [
+    ...cityMatches,
+    ...geocodeSuggestions.filter(
+      (g) => !cityMatches.some((c) => c.name.toLowerCase() === g.name.toLowerCase()),
+    ),
+  ]
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -35,7 +55,7 @@ export function SearchBar() {
 
   const search = useCallback(async (q: string) => {
     if (q.length < 2) {
-      setSuggestions([])
+      setGeocodeSuggestions([])
       return
     }
     setLoading(true)
@@ -43,10 +63,9 @@ export function SearchBar() {
       const res = await fetch(`/api/geocode?query=${encodeURIComponent(q)}`)
       if (!res.ok) throw new Error('Geocode failed')
       const data: Suggestion[] = await res.json()
-      setSuggestions(data)
-      setOpen(data.length > 0)
+      setGeocodeSuggestions(data)
     } catch {
-      setSuggestions([])
+      setGeocodeSuggestions([])
     } finally {
       setLoading(false)
     }
@@ -54,6 +73,7 @@ export function SearchBar() {
 
   const handleChange = (value: string) => {
     setQuery(value)
+    setOpen(true)
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => search(value), 300)
   }
@@ -62,6 +82,7 @@ export function SearchBar() {
     setSelectedLocation({ lat: s.lat, lon: s.lon, name: s.full_name ?? s.name })
     setQuery(s.full_name ?? s.name)
     setOpen(false)
+    setGeocodeSuggestions([])
   }
 
   return (
@@ -70,6 +91,7 @@ export function SearchBar() {
         type="text"
         value={query}
         onChange={(e) => handleChange(e.target.value)}
+        onFocus={() => setOpen(true)}
         placeholder="Search location…"
         className="w-full rounded-lg bg-surface-alt border border-border px-4 py-2.5
                    text-text-primary placeholder:text-text-secondary
@@ -84,19 +106,27 @@ export function SearchBar() {
 
       {open && suggestions.length > 0 && (
         <ul className="absolute z-50 mt-1 w-full rounded-lg bg-surface-alt border border-border
-                        shadow-lg overflow-hidden">
+                        shadow-lg overflow-hidden max-h-72 overflow-y-auto">
+          {!q && (
+            <li className="px-4 py-1.5 text-[10px] text-text-secondary font-semibold uppercase tracking-wider border-b border-border">
+              Popular cities
+            </li>
+          )}
           {suggestions.map((s, i) => (
             <li key={`${s.lat}-${s.lon}-${i}`}>
               <button
                 type="button"
                 onClick={() => handleSelect(s)}
                 className="w-full text-left px-4 py-2.5 hover:bg-surface-hover
-                           transition-colors text-sm"
+                           transition-colors text-sm flex items-center gap-2"
               >
-                <span className="text-text-primary">{s.name}</span>
-                {s.country && (
-                  <span className="text-text-secondary ml-1">— {s.country}</span>
-                )}
+                {s.isCity && <span className="text-accent text-[10px] shrink-0">★</span>}
+                <span>
+                  <span className="text-text-primary">{s.name}</span>
+                  {s.country && (
+                    <span className="text-text-secondary ml-1">— {s.country}</span>
+                  )}
+                </span>
               </button>
             </li>
           ))}

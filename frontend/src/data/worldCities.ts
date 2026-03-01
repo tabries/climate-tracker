@@ -99,6 +99,7 @@ export const WORLD_CITIES: CityDataPoint[] = [
   { name: 'Port-au-Prince', lat: 18.55, lon: -72.34, temp: 31 },
   { name: 'Paramaribo', lat: 5.87, lon: -55.17, temp: 27 },
   { name: 'Georgetown', lat: 6.8, lon: -58.16, temp: 28 },
+  { name: 'Santa Cruz de la Sierra', lat: -17.8, lon: -63.17, temp: 28 },
 
   // ── Latin America — major cities ──────────────────────────
   { name: 'Medellín', lat: 6.24, lon: -75.59, temp: 22 },
