@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { apiClient } from '../config/apiClient'
+import { trackMapTilerCall } from '../utils/usageTracker'
 import { logger } from '../utils/logger'
 import type { GeocodeResult, GeocodeResponse } from '../types/geocode'
 
@@ -9,8 +10,10 @@ export async function geocode(query: string): Promise<GeocodeResult[]> {
   const apiKey = process.env.MAPTILER_API_KEY
   if (!apiKey) throw new Error('MAPTILER_API_KEY is not set')
 
+  await trackMapTilerCall()
+
   // MapTiler geocoding endpoint: query goes in URL path
-  const url = `${MAPTILER_BASE}/${query}.json`
+  const url = `${MAPTILER_BASE}/${encodeURIComponent(query)}.json`
   logger.info(`[Geocode] URL: ${url}`)
 
   try {

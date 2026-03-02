@@ -19,6 +19,7 @@ import geocodeRoutes from './routes/geocodeRoutes'
 import airQualityRoutes from './routes/airQualityRoutes'
 import tileRoutes from './routes/tileRoutes'
 import historyRoutes from './routes/historyRoutes'
+import usageRoutes from './routes/usageRoutes'
 
 const app = express()
 const httpServer = createServer(app)
@@ -46,6 +47,7 @@ app.use('/api/air-quality', airQualityRoutes)
 app.use('/api/tiles', tileRoutes)
 app.use('/api/history', historyRoutes)
 app.use('/api/history/export', exportLimiter)
+app.use('/api/usage', usageRoutes)
 
 // Global error handler — must be last
 app.use(errorHandler)
