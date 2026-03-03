@@ -7,6 +7,7 @@ import { Legend } from '@/components/Map/Legend'
 import { GlobeLegend } from '@/components/Globe/GlobeLegend'
 import { RealtimeStatus } from '@/components/RealtimeStatus'
 import { AlertsBadge } from '@/components/AlertsBadge'
+import { ApiUsageBadge } from '@/components/ApiUsageBadge'
 import { AnalyticsPanel } from '@/components/Analytics/AnalyticsPanel'
 import { useSocket } from '@/hooks/useSocket'
 import { useViewStore, type ViewMode } from '@/store/viewStore'
@@ -67,9 +68,12 @@ export function Layout() {
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-1">
             <h1 className="text-base font-bold tracking-tight">
-              🌍 Climate Tracker
+              Climate Tracker
             </h1>
-            <AlertsBadge />
+            <div className="flex items-center gap-2">
+              <ApiUsageBadge />
+              <AlertsBadge />
+            </div>
           </div>
           <RealtimeStatus />
           <div className="mt-3">
