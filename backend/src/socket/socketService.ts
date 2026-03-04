@@ -89,6 +89,7 @@ async function fetchAndEmit(
 
     if (aqiResult.status === 'fulfilled') {
       const a = aqiResult.value
+      const locationName = weatherResult.status === 'fulfilled' ? weatherResult.value.location : undefined
       const update: AirQualityUpdate = {
         lat,
         lon,
@@ -99,8 +100,8 @@ async function fetchAndEmit(
       }
       io.to(key).emit('air-quality:update', update)
 
-      // Persist to InfluxDB (fire-and-forget)
-      writeAirQualityPoint(lat, lon, a)
+      // Persist to InfluxDB (fire-and-forget) — include location tag if available
+      writeAirQualityPoint(lat, lon, a, locationName)
     }
   } catch (err) {
     logger.error(`Socket broadcast error for ${key}`, {

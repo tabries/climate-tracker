@@ -46,13 +46,14 @@ export function writeWeatherPoint(data: WeatherResponse): void {
  * Write an air quality data point to InfluxDB.
  *
  * Measurement: `air_quality`
- * Tags: lat, lon
+ * Tags: lat, lon, location (optional — provided when written via socket)
  * Fields: aqi, pm2_5, pm10, o3, no2, so2, co, nh3
  */
 export function writeAirQualityPoint(
   lat: number,
   lon: number,
   data: AirQualityData,
+  location?: string,
 ): void {
   const client = getInfluxClient()
   if (!client) return
@@ -63,6 +64,10 @@ export function writeAirQualityPoint(
     const point = new Point('air_quality')
       .tag('lat', lat.toFixed(2))
       .tag('lon', lon.toFixed(2))
+
+    if (location) point.tag('location', location)
+
+    point
       .intField('aqi', data.aqi)
       .stringField('label', data.label)
       .floatField('pm2_5', data.components.pm2_5)
