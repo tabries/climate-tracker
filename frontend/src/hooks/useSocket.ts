@@ -75,6 +75,7 @@ export function useSocket() {
 
     // ── Real-time weather updates → push into Zustand ──────────────
     s.on('weather:update', (data: WeatherData & { timestamp: string }) => {
+      if (useRealtimeStore.getState().isPaused) return
       const { timestamp, ...weatherData } = data
 
       // Only update if it's for the currently selected location
@@ -92,6 +93,7 @@ export function useSocket() {
     s.on(
       'air-quality:update',
       (data: AirQualityData & { lat: number; lon: number; timestamp: string }) => {
+        if (useRealtimeStore.getState().isPaused) return
         const currentLoc = useWeatherStore.getState().selectedLocation
         if (
           currentLoc &&

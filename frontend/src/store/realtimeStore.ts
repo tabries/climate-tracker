@@ -40,6 +40,8 @@ interface RealtimeState {
   addAlerts: (event: AlertEvent) => void
   dismissAlerts: () => void
   clearAlerts: () => void
+  isPaused: boolean
+  togglePause: () => void
 }
 
 /* ── Store ──────────────────────────────────────────────────────────────── */
@@ -63,4 +65,7 @@ export const useRealtimeStore = create<RealtimeState>((set) => ({
 
   dismissAlerts: () => set({ hasUnreadAlerts: false }),
   clearAlerts: () => set({ alerts: [], hasUnreadAlerts: false }),
+
+  isPaused: false,
+  togglePause: () => set((s) => ({ isPaused: !s.isPaused })),
 }))
