@@ -11,6 +11,7 @@ An interactive dashboard for visualizing global climate data in real time, combi
 ## Preview
 
 3D Map and climate visual information
+
 https://github.com/user-attachments/assets/f13717b2-56f5-4287-aa7e-9b60c8e30d84
 
 ---
