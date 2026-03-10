@@ -126,7 +126,7 @@ export function Layout() {
 
         {/* Globe overlays (only show in globe mode) */}
         {viewMode === 'globe' && (
-          <div className="absolute bottom-6 left-4 z-10">
+          <div className="absolute bottom-14 left-4 z-10">
             <GlobeLegend />
           </div>
         )}
