@@ -69,7 +69,7 @@ export function Atmosphere() {
   })
 
   return (
-    <mesh ref={ref} scale={1.12}>
+    <mesh ref={ref} scale={1.015}>
       <sphereGeometry args={[1, 64, 64]} />
       <atmosphereMaterial
         transparent
