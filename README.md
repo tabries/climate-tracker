@@ -10,9 +10,14 @@ An interactive dashboard for visualizing global climate data in real time, combi
 
 ## Preview
 
-3D Map and climate visual information
+3D Map for quick city selection
 
 https://github.com/user-attachments/assets/f13717b2-56f5-4287-aa7e-9b60c8e30d84
+
+2D Map with Climate data layers
+
+https://github.com/user-attachments/assets/693b6030-1f70-477a-883a-6c4c5ed8954a
+
 
 ---
 
