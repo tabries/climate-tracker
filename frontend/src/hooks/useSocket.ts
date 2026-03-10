@@ -42,6 +42,7 @@ export function useSocket() {
   const setLastUpdate = useRealtimeStore((s) => s.setLastUpdate)
   const setBroadcastInterval = useRealtimeStore((s) => s.setBroadcastInterval)
   const addAlerts = useRealtimeStore((s) => s.addAlerts)
+  const isPaused = useRealtimeStore((s) => s.isPaused)
 
   // ── Connect / disconnect lifecycle ──────────────────────────────────
   useEffect(() => {
@@ -75,7 +76,6 @@ export function useSocket() {
 
     // ── Real-time weather updates → push into Zustand ──────────────
     s.on('weather:update', (data: WeatherData & { timestamp: string }) => {
-      if (useRealtimeStore.getState().isPaused) return
       const { timestamp, ...weatherData } = data
 
       // Only update if it's for the currently selected location
@@ -93,7 +93,6 @@ export function useSocket() {
     s.on(
       'air-quality:update',
       (data: AirQualityData & { lat: number; lon: number; timestamp: string }) => {
-        if (useRealtimeStore.getState().isPaused) return
         const currentLoc = useWeatherStore.getState().selectedLocation
         if (
           currentLoc &&
@@ -166,4 +165,15 @@ export function useSocket() {
       prevLocationRef.current = null
     }
   }, [selectedLocation, subscribe, unsubscribe])
+
+  // ── Pause / resume: subscribe or unsubscribe on the backend ────────
+  useEffect(() => {
+    const loc = prevLocationRef.current
+    if (!loc) return
+    if (isPaused) {
+      unsubscribe(loc.lat, loc.lon)
+    } else {
+      subscribe(loc.lat, loc.lon)
+    }
+  }, [isPaused, subscribe, unsubscribe])
 }
